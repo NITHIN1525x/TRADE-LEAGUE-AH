@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Create Room{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[calc(100vh-120px)]">
+    <div class="w-full max-w-lg px-4">
+        <div class="pixel-card p-8 text-center">
+            <h1 class="text-sm neon-green mb-2">CREATE ROOM</h1>
+            <p class="text-[8px] text-gray-500 mb-8">Set up a new 1v1 trading match</p>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <div class="text-left">
+                    <label class="block text-[8px] text-gray-500 mb-2 uppercase tracking-wider">
+                        &gt; Trade Duration
+                    </label>
+                    <select name="trade_duration"
+                            class="w-full px-4 py-3 rounded-none">
+                        <option value="5">5 MINUTES</option>
+                        <option value="10">10 MINUTES</option>
+                        <option value="15">15 MINUTES</option>
+                    </select>
+                </div>
+
+                <button type="submit"
+                        class="pixel-btn pixel-btn-green w-full py-3 text-[9px] font-bold rounded-none">
+                    + CREATE ROOM
+                </button>
+            </form>
+
+            <a href="{% url 'lobby' %}" class="inline-block mt-4 text-[8px] text-gray-500 hover:text-[#00e5ff] transition">
+                ← BACK TO LOBBY
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

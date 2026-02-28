@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Waiting Room - TradeLeague{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[calc(100vh-120px)]">
+    <div class="w-full max-w-2xl px-4">
+
+        <!-- Main Card -->
+        <div class="pixel-card p-10 text-center">
+
+            <!-- Animated Waiting Icon -->
+            <div class="mb-6">
+                <h1 class="text-sm neon-green mb-2">READY TO TRADE?</h1>
+                <p class="text-[8px] text-gray-500">Waiting for opponent to join...</p>
+            </div>
+
+            <!-- Room Code Section -->
+            <div class="bg-[#0a0a0f] border-2 border-[#2a2a3a] p-6 mb-6">
+                <p class="text-[7px] text-gray-600 uppercase tracking-wider mb-3">Room Code</p>
+
+                <div class="flex items-center justify-center space-x-3 mb-3">
+                    <p class="text-2xl neon-cyan font-bold tracking-[0.3em]">
+                        {{ room.room_code }}
+                    </p>
+                    <button onclick="copyCode(this)"
+                            class="px-3 py-1.5 bg-[#00e5ff10] border border-[#00e5ff33] text-[7px] neon-cyan font-bold uppercase tracking-wider hover:bg-[#00e5ff20] hover:border-[#00e5ff] transition-all"
+                            title="Copy room code">
+                        COPY
+                    </button>
+                </div>
+
+                <p class="text-[7px] text-gray-600">Share this code with your opponent</p>
+            </div>
+
+            <!-- Room Status -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+
+                <!-- Host -->
+                <div class="bg-[#0a0a0f] border-2 border-[#2a2a3a] p-4">
+                    <p class="text-[7px] text-gray-600 uppercase tracking-wider mb-2">Host</p>
+                    <p class="text-[9px] text-white font-bold">{{ room.host.username }}</p>
+                    <p class="text-[8px] neon-green mt-1">CONNECTED</p>
+                </div>
+
+                <!-- Opponent -->
+                <div class="bg-[#0a0a0f] border-2 border-[#2a2a3a] p-4">
+                    <p class="text-[7px] text-gray-600 uppercase tracking-wider mb-2">Opponent</p>
+
+                    {% if room.opponent %}
+                        <p class="text-[9px] text-white font-bold">{{ room.opponent.username }}</p>
+                        <p class="text-[8px] neon-green mt-1">CONNECTED</p>
+                    {% else %}
+                        <p class="text-[9px] text-gray-500 font-bold">WAITING...</p>
+                        <div class="flex justify-center space-x-1 mt-2">
+                            <div class="w-1.5 h-1.5 bg-[#ffd700] rounded-full animate-pulse"></div>
+                            <div class="w-1.5 h-1.5 bg-[#ffd700] rounded-full animate-pulse" style="animation-delay:0.2s"></div>
+                            <div class="w-1.5 h-1.5 bg-[#ffd700] rounded-full animate-pulse" style="animation-delay:0.4s"></div>
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <!-- Instructions -->
+            <div class="bg-[#0a0a0f] border-2 border-[#00e5ff33] p-5 mb-6 text-left">
+                <h3 class="text-[9px] neon-cyan font-bold mb-3">&gt; WHAT'S NEXT?</h3>
+                <ol class="space-y-2">
+                    <li class="flex items-start text-[8px]">
+                        <span class="neon-cyan font-bold mr-3">1.</span>
+                        <span class="text-gray-400">Share the room code with your opponent</span>
+                    </li>
+                    <li class="flex items-start text-[8px]">
+                        <span class="neon-cyan font-bold mr-3">2.</span>
+                        <span class="text-gray-400">Opponent joins the room</span>
+                    </li>
+                    <li class="flex items-start text-[8px]">
+                        <span class="neon-cyan font-bold mr-3">3.</span>
+                        <span class="text-gray-400">Host starts the game</span>
+                    </li>
+                </ol>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-3">
+
+                {% if room.opponent %}
+                    {% if user == room.host %}
+                        <form method="post" class="flex-1">
+                            {% csrf_token %}
+                            <button type="submit"
+                                class="pixel-btn pixel-btn-green w-full py-3 text-[9px] font-bold rounded-none">
+                                START GAME
+                            </button>
+                        </form>
+                    {% else %}
+                        <button disabled
+                            class="flex-1 bg-[#12121a] border-2 border-[#2a2a3a] text-gray-500
+                                   text-[9px] font-bold py-3 px-6 cursor-not-allowed opacity-60 rounded-none">
+                            WAITING FOR HOST...
+                        </button>
+                    {% endif %}
+                {% else %}
+                    <button disabled
+                        class="flex-1 bg-[#12121a] border-2 border-[#2a2a3a] text-gray-500
+                               text-[9px] font-bold py-3 px-6 cursor-not-allowed opacity-50 rounded-none">
+                        WAITING FOR OPPONENT...
+                    </button>
+                {% endif %}
+
+                <a href="{% url 'lobby' %}"
+                   class="pixel-btn pixel-btn-outline flex-1 py-3 text-[9px] font-bold text-center rounded-none">
+                    ← BACK TO LOBBY
+                </a>
+            </div>
+
+            <!-- Auto Refresh Info -->
+            <p class="text-[7px] text-gray-600 mt-5">
+                AUTO-REFRESH ACTIVE • PAGE UPDATES EVERY 3S
+            </p>
+
+        </div>
+    </div>
+</div>
+
+<!-- Copy handler -->
+<script>
+function copyCode(btn) {
+    navigator.clipboard.writeText('{{ room.room_code }}');
+    btn.textContent = 'COPIED!';
+    btn.classList.remove('neon-cyan', 'border-[#00e5ff33]', 'bg-[#00e5ff10]');
+    btn.classList.add('neon-green', 'border-[#00ff8833]', 'bg-[#00ff8810]');
+    setTimeout(() => {
+        btn.textContent = 'COPY';
+        btn.classList.remove('neon-green', 'border-[#00ff8833]', 'bg-[#00ff8810]');
+        btn.classList.add('neon-cyan', 'border-[#00e5ff33]', 'bg-[#00e5ff10]');
+    }, 2000);
+}
+</script>
+
+<!-- Auto-refresh every 3 seconds -->
+<script>
+    setTimeout(() => {
+        location.reload();
+    }, 3000);
+</script>
+{% endblock %}
